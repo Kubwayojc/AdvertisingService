@@ -69,7 +69,8 @@ public class AdvertisementSelectionLogic {
             List<AdvertisementContent> advertisementContents = contents.stream()
 
                     .filter(content -> CollectionUtils.isNotEmpty(contents))
-                    .map(content -> contents.get(random.nextInt(contents.size()))).toList();
+                    .map(content -> contents.get(random.nextInt(contents.size())))
+                    .collect(Collectors.toList());
 
 //            if (CollectionUtils.isNotEmpty(contents)) {
 //                AdvertisementContent randomAdvertisementContent = contents.get(random.nextInt(contents.size()));
