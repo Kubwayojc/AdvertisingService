@@ -39,6 +39,8 @@ public class GenerateAdActivity {
      * @return the response will contain the generated advertisement. It's content will be an empty String if no
      *      advertisement could be generated.
      */
+
+
     public GenerateAdvertisementResponse generateAd(GenerateAdvertisementRequest request) {
         String customerId = request.getCustomerId();
         String marketplaceId = request.getMarketplaceId();

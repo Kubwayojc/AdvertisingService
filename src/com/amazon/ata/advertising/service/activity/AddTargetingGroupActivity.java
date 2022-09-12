@@ -56,7 +56,7 @@ public class AddTargetingGroupActivity {
 //         targetingPredicates = null;
 //        if (requestedTargetingPredicates != null) {
             List<TargetingPredicate> targetingPredicates = requestedTargetingPredicates.stream()
-                    .filter(requestedTargetingPredicate -> !requestedTargetingPredicates.equals(null))
+                    .filter(requestedTargetingPredicate -> true)
 
                     .map(TargetingPredicateTranslator::fromCoral)
                     .collect(Collectors.toList());
