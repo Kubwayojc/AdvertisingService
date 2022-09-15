@@ -12,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -73,13 +75,14 @@ public class AdvertisementSelectionLogic {
         } else {
 
             TargetingEvaluator targetingEvaluator = new TargetingEvaluator(new RequestContext(customerId, marketplaceId));
+            ExecutorService executorService = Executors.newCachedThreadPool();
 
             generatedAdvertisement = new GeneratedAdvertisement(contentDao.get(marketplaceId).stream()
                     .map(content -> targetingGroupDao.get(content.getContentId()).stream()
-                        .sorted(Comparator.comparing(TargetingGroup::getClickThroughRate))
-                        .map(targetingEvaluator::evaluate)
-                        .anyMatch(TargetingPredicateResult::isTrue) ? content : null)
-                        .filter(Objects::nonNull)
+                    .sorted(Comparator.comparing(TargetingGroup::getClickThroughRate))
+                    .map(targetingEvaluator::evaluate)
+                    .anyMatch(TargetingPredicateResult::isTrue) ? content : null)
+                    .filter(Objects::nonNull)
                     .findAny().get());
         }
 

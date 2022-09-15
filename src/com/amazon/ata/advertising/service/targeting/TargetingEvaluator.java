@@ -7,6 +7,8 @@ import dagger.Provides;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class TargetingEvaluator {
     public static final boolean IMPLEMENTED_STREAMS = true;
-    public static final boolean IMPLEMENTED_CONCURRENCY = false;
+    public static final boolean IMPLEMENTED_CONCURRENCY = true;
     private final RequestContext requestContext;
 
     /**
@@ -37,6 +39,8 @@ public class TargetingEvaluator {
 
     //@Provides
     public TargetingPredicateResult evaluate(TargetingGroup targetingGroup) {
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
 
         return targetingGroup.getTargetingPredicates()
                 .stream()
