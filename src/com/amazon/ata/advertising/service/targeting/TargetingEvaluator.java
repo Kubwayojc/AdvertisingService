@@ -42,10 +42,16 @@ public class TargetingEvaluator {
 
         ExecutorService executorService = Executors.newCachedThreadPool();
 
-        return targetingGroup.getTargetingPredicates()
+
+
+        TargetingPredicateResult results =  targetingGroup.getTargetingPredicates()
                 .stream()
                 .allMatch(predicate -> predicate.evaluate(requestContext).isTrue())
                 ? TargetingPredicateResult.TRUE : TargetingPredicateResult.FALSE;
+
+
+
+        return results;
     }
 }
 //        List<TargetingPredicate> targetingPredicates = targetingGroup.getTargetingPredicates();

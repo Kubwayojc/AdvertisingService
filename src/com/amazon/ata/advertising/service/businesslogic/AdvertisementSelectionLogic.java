@@ -10,6 +10,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -65,30 +66,56 @@ public class AdvertisementSelectionLogic {
      * not be generated.
      */
 
-    public GeneratedAdvertisement selectAdvertisement(String customerId, String marketplaceId) {
+//    public GeneratedAdvertisement selectAdvertisement(String customerId, String marketplaceId) {
+//
+//        GeneratedAdvertisement generatedAdvertisement = new EmptyGeneratedAdvertisement();
+//
+//        if (StringUtils.isEmpty(marketplaceId)) {
+//            LOG.warn("MarketplaceId cannot be null or empty. Returning empty ad.");
+//
+//        } else {
 
-        GeneratedAdvertisement generatedAdvertisement = new EmptyGeneratedAdvertisement();
-
-        if (StringUtils.isEmpty(marketplaceId)) {
-            LOG.warn("MarketplaceId cannot be null or empty. Returning empty ad.");
-
-        } else {
-
-            TargetingEvaluator targetingEvaluator = new TargetingEvaluator(new RequestContext(customerId, marketplaceId));
-            ExecutorService executorService = Executors.newCachedThreadPool();
-
-            generatedAdvertisement = new GeneratedAdvertisement(contentDao.get(marketplaceId).stream()
-                    .map(content -> targetingGroupDao.get(content.getContentId()).stream()
-                    .sorted(Comparator.comparing(TargetingGroup::getClickThroughRate))
-                    .map(targetingEvaluator::evaluate)
-                    .anyMatch(TargetingPredicateResult::isTrue) ? content : null)
-                    .filter(Objects::nonNull)
-                    .findAny().get());
-        }
-
-        return generatedAdvertisement;
-    }
-}
+//            TargetingEvaluator targetingEvaluator = new TargetingEvaluator(new RequestContext(customerId, marketplaceId));
+//            ExecutorService executorService = Executors.newCachedThreadPool();
+//
+//            TreeMap<TargetingGroup, Integer> treeMap = new TreeMap<>(Comparator.comparing(TargetingGroup::getClickThroughRate));
+//
+//            generatedAdvertisement = new GeneratedAdvertisement(contentDao.get(marketplaceId).stream()
+//                    .map(content -> targetingGroupDao.get(content.getContentId()).stream()
+//
+//
+////                    .sorted(Comparator.comparing(TargetingGroup::getClickThroughRate))
+//
+//                    .map(targetingEvaluator::evaluate)
+//                    .anyMatch(TargetingPredicateResult::isTrue) ? content : null)
+//                    .filter(Objects::nonNull)
+//
+//                    .findAny().get());
+//        }
+//
+//
+//
+//
+//
+//
+////        TargetingEvaluator targetingEvaluator = new TargetingEvaluator(new RequestContext(customerId, marketplaceId));
+////        ExecutorService executorService = Executors.newCachedThreadPool();
+////
+////        generatedAdvertisement = new GeneratedAdvertisement(contentDao.get(marketplaceId).stream()
+////                .map(content -> targetingGroupDao.get(content.getContentId()).stream()
+////                        .sorted(Comparator.comparing(TargetingGroup::getClickThroughRate))
+////                        .map(targetingEvaluator::evaluate)
+////                        .anyMatch(TargetingPredicateResult::isTrue) ? content : null)
+////                .filter(Objects::nonNull)
+////                .findAny().get());
+////    }
+//
+//
+//
+//
+//        return generatedAdvertisement;
+//    }
+//}
 
 //            final List<AdvertisementContent> contents = contentDao.get(marketplaceId);
 //            contents.stream()
@@ -157,20 +184,29 @@ public class AdvertisementSelectionLogic {
 //}
 //          original code:
 
-//    public GeneratedAdvertisement selectAdvertisement(String customerId, String marketplaceId) {
-//        GeneratedAdvertisement generatedAdvertisement = new EmptyGeneratedAdvertisement();
-//        if (StringUtils.isEmpty(marketplaceId)) {
-//            LOG.warn("MarketplaceId cannot be null or empty. Returning empty ad.");
-//        } else {
-//            final List<AdvertisementContent> contents = contentDao.get(marketplaceId);
-//
-//            if (CollectionUtils.isNotEmpty(contents)) {
-//                AdvertisementContent randomAdvertisementContent = contents.get(random.nextInt(contents.size()));
-//                generatedAdvertisement = new GeneratedAdvertisement(randomAdvertisementContent);
-//            }
-//
-//        }
-//
-//        return generatedAdvertisement;
-//    }
-//}
+    public GeneratedAdvertisement selectAdvertisement(String customerId, String marketplaceId) {
+        GeneratedAdvertisement generatedAdvertisement = new EmptyGeneratedAdvertisement();
+        if (StringUtils.isEmpty(marketplaceId)) {
+            LOG.warn("MarketplaceId cannot be null or empty. Returning empty ad.");
+        } else {
+            final List<AdvertisementContent> contents = contentDao.get(marketplaceId);
+
+            TreeMap<Double, TargetingGroup> treeMap = new TreeMap<>();
+            for(AdvertisementContent content : contents) {
+                List<TargetingGroup> groups = targetingGroupDao.get(content.getContentId());
+                for(TargetingGroup group : groups) {
+                    double click = group.getClickThroughRate();
+                    treeMap.put(click, group);
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(contents)) {
+                AdvertisementContent advertisementContent = contents.get(treeMap.size()-1);
+                generatedAdvertisement = new GeneratedAdvertisement(advertisementContent);
+            }
+
+        }
+
+        return generatedAdvertisement;
+    }
+}
