@@ -197,18 +197,24 @@ public class AdvertisementSelectionLogic {
                 for(TargetingGroup group : groups) {
                     double click = group.getClickThroughRate();
                     treeMap.put(click, group);
+
                 }
+
+                Double max = treeMap.keySet().stream().max(Double::compare).get();
+                for(TargetingGroup group : groups) {
+                    if(group.getClickThroughRate() == max) {
+                        generatedAdvertisement =  new GeneratedAdvertisement(content);
+                    }
+                }
+
             }
 
-            if (CollectionUtils.isNotEmpty(contents)) {
-                AdvertisementContent advertisementContent = contents.get(treeMap.size()-1);
-                generatedAdvertisement = new GeneratedAdvertisement(advertisementContent);
+
             }
+        return generatedAdvertisement;
 
         }
 
-        return generatedAdvertisement;
+
     }
 
-
-}
