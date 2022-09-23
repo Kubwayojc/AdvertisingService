@@ -210,5 +210,5 @@ public class AdvertisementSelectionLogic {
         return generatedAdvertisement;
     }
 
-    //
+
 }
